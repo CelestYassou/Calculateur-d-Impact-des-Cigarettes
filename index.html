@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="imagetete.ico" sizes="64x64" type="image/x-icon">
+    <title>Calculateur d'Impact des Cigarettes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: hsl(202, 37%, 55%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+        }
+        h1 {
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background-color: hsl(202, 37%, 55%);
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+        #loading {
+            display: none;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+    </style>
+    <script>
+        function getDateDifference(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        async function calculate() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const cigarettesPerDay = document.getElementById('cigarettes-per-day').value;
+            
+            const totalDays = getDateDifference(startDate, endDate);
+            const totalCigarettes = totalDays * cigarettesPerDay;
+
+            const minutesLostPerCigarette = 11;
+            const pricePerCigarette = 0.50; // Adjust this value based on average price
+            const co2PerCigarette = 14; // Average CO2 in grams per cigarette
+            const co2PerKm = 192; // Average CO2 in grams per kilometer for a car at 10 km/h
+
+            const totalMinutesLost = totalCigarettes * minutesLostPerCigarette;
+            const totalDaysLost = (totalMinutesLost / 60 / 24).toFixed(2);
+            const totalMoneySaved = (totalCigarettes * pricePerCigarette).toFixed(2);
+            const totalCo2Emissions = (totalCigarettes * co2PerCigarette).toFixed(2);
+            const totalHoursCar = (totalCo2Emissions / co2PerKm / 10).toFixed(2);
+
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading delay
+
+            document.getElementById('result').innerHTML = `
+                <p>Nombre de cigarettes : ${totalCigarettes}</p>
+                <p>Temps de vie perdu : ${totalDaysLost} jours / ${totalMinutesLost} minutes</p>
+                <p>Argent perdu : €${totalMoneySaved}</p>
+                <p>CO2 emis : ${totalCo2Emissions} grammes</p>
+                <p>Equivalent en heures de voiture a 10 km/h : ${totalHoursCar} heures</p>
+                <p><a href="https://sante.gouv.fr/prevention-en-sante/addictions/article/dispositif-d-accompagnement-a-l-arret-du-tabac">Accompagnement à l’arrêt du tabac (Gouvernement)</p>
+                <p><a href="https://mois-sans-tabac.tabac-info-service.fr/">Mois sans tabac (Gouvernement et tiers)</p>
+                <p><a href="infoscode.html">Infos sur le Code</p>
+            `;
+            loading.style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculateur d'Impact des Cigarettes</h1>
+        <input type="date" id="start-date" placeholder="Date de début">
+        <input type="date" id="end-date" placeholder="Date de fin">
+        <input type="number" id="cigarettes-per-day" placeholder="Cigarettes par jour">
+        <button onclick="calculate()">Calculer</button>
+        <div id="loading">
+            <img src="loading.gif" alt="Chargement...">
+        </div>
+        <div id="result"></div>
+    </div>
+</body>
+</html>
